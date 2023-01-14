@@ -1,6 +1,6 @@
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://du-web-mp5m.vercel.app",
+  "https://du-web-five.vercel.app",
 ];
 
 const corsOption = {
