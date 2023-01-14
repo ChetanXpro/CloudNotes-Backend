@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Note = require("../models/Note");
 const Collection = require("../models/Collection");
 const asyncHandler = require("express-async-handler");
+const formatBytes = require("../config/formateByte");
 
 // Create collection
 const createCollection = asyncHandler(async (req, res) => {
@@ -59,9 +60,13 @@ const getCollectionList = asyncHandler(async (req, res) => {
 
 // Create notes
 const createNotes = asyncHandler(async (req, res) => {
-  const { collectionName, noteName, url } = req.body;
-  if (typeof (collectionName || noteName || url) !== "string")
+  const { collectionName, noteName, url, fileSize } = req.body;
+  
+
+  if (typeof (collectionName || noteName || url) !== "string" && !fileSize)
     return res.status(400).json({ success: false, message: "Invalid data" });
+
+  const size = formatBytes(fileSize);
 
   const collectionFound = await Collection.findOne({ title: collectionName });
 
@@ -75,6 +80,7 @@ const createNotes = asyncHandler(async (req, res) => {
     name: noteName,
     userId: req.id,
     url,
+    size,
     collectionID: collectionFound._id,
   });
 
@@ -100,6 +106,7 @@ const getNotes = asyncHandler(async (req, res) => {
     const obj = {
       id: i._id,
       name: i.name,
+      size: i.size,
       url: i.url,
     };
     return obj;
@@ -154,10 +161,7 @@ const deleteNote = asyncHandler(async (req, res) => {
   const collectionFound = await Collection.findById(foundNote.collectionID);
   await collectionFound.updateOne({ $inc: { totalNotesInside: -1 } });
 
- const cc = await foundNote.deleteOne();
- 
-
-  
+  const cc = await foundNote.deleteOne();
 
   res.status(200).json({ success: true, message: "note deleted" });
 });

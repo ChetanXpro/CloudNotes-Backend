@@ -27,7 +27,7 @@ const login = asyncHandler(async (req, res) => {
       id: foundUser.id,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "5h" }
+    { expiresIn: "24h" }
   );
 
   const newRefreshToken = jwt.sign(
@@ -50,7 +50,7 @@ const login = asyncHandler(async (req, res) => {
   });
 
   res.json({ email: foundUser.email, name: foundUser.name, accessToken });
-  console.log("Logined");
+ 
 });
 
 // !Refresh
