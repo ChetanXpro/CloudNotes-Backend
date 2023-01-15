@@ -101,6 +101,7 @@ const createNotes = asyncHandler(async (req, res) => {
   await collectionFound.updateOne({ $inc: { totalNotesInside: +1 } });
 
   await deleteKey(`Notes${collectionFound._id}`);
+  await deleteKey(`Collection${req.id}`);
 
   res.status(200).json({ success: true, message: "Note Uploaded" });
 });
@@ -141,6 +142,31 @@ const getNotes = asyncHandler(async (req, res) => {
   res.status(200).json({ arr });
 });
 
+const deleteNote = asyncHandler(async (req, res) => {
+  const { noteID } = req.query;
+
+  if (!noteID || noteID.length !== 24)
+    return res.status(400).json({
+      success: false,
+      message: "Please provide a valid collection id",
+    });
+
+  const foundNote = await Note.findOne({ _id: noteID, userId: req.id });
+
+  if (!foundNote)
+    return res.status(400).json({ success: false, message: "No note found" });
+
+  const collectionFound = await Collection.findById(foundNote.collectionID);
+  await collectionFound.updateOne({ $inc: { totalNotesInside: -1 } });
+
+  const cc = await foundNote.deleteOne();
+
+  await deleteKey(`Notes${collectionFound._id}`);
+  await deleteKey(`Collection${req.id}`);
+
+  res.status(200).json({ success: true, message: "note deleted" });
+});
+
 const deleteCollection = asyncHandler(async (req, res) => {
   const { collectionID } = req.query;
 
@@ -166,33 +192,6 @@ const deleteCollection = asyncHandler(async (req, res) => {
 });
 
 const updateNote = asyncHandler(async (req, res) => {});
-
-const deleteNote = asyncHandler(async (req, res) => {
-  const { noteID } = req.query;
-
-  if (!noteID || noteID.length !== 24)
-    return res.status(400).json({
-      success: false,
-      message: "Please provide a valid collection id",
-    });
-
-  // const { acknowledged, deletedCount } = await Note.deleteOne({
-  //   _id: noteID,
-  //   userId: req.id,
-  // });
-
-  const foundNote = await Note.findOne({ _id: noteID, userId: req.id });
-
-  if (!foundNote)
-    return res.status(400).json({ success: false, message: "No note found" });
-
-  const collectionFound = await Collection.findById(foundNote.collectionID);
-  await collectionFound.updateOne({ $inc: { totalNotesInside: -1 } });
-
-  const cc = await foundNote.deleteOne();
-
-  res.status(200).json({ success: true, message: "note deleted" });
-});
 
 module.exports = {
   createCollection,
