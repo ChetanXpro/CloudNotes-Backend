@@ -3,6 +3,7 @@ const Note = require("../models/Note");
 const Collection = require("../models/Collection");
 const asyncHandler = require("express-async-handler");
 const formatBytes = require("../config/formateByte");
+const { getKey, setKey, deleteKey } = require("../config/redis");
 
 // Create collection
 const createCollection = asyncHandler(async (req, res) => {
@@ -26,7 +27,10 @@ const createCollection = asyncHandler(async (req, res) => {
   await Collection.create({
     user: req.id,
     title: collectionName,
+    totalNotesInside: 0,
   });
+
+  await deleteKey(`Collection${req.id}`);
 
   res
     .status(200)
@@ -41,6 +45,14 @@ const getCollectionList = asyncHandler(async (req, res) => {
       .status(400)
       .json({ success: false, message: "Something went wrong" });
 
+  const cache = await getKey(`Collection${id}`);
+
+  if (cache) {
+    const arr = JSON.parse(cache);
+    console.log(`Found collection in cache`);
+    return res.status(200).json({ ...arr });
+  }
+
   const collectionFound = await Collection.find({
     user: id,
   }).lean();
@@ -54,6 +66,9 @@ const getCollectionList = asyncHandler(async (req, res) => {
     };
     return obj;
   });
+  console.log(arr);
+
+  await setKey(`Collection${id}`, JSON.stringify({ arr }));
 
   res.status(200).json({ arr });
 });
@@ -61,7 +76,6 @@ const getCollectionList = asyncHandler(async (req, res) => {
 // Create notes
 const createNotes = asyncHandler(async (req, res) => {
   const { collectionName, noteName, url, fileSize } = req.body;
-  
 
   if (typeof (collectionName || noteName || url) !== "string" && !fileSize)
     return res.status(400).json({ success: false, message: "Invalid data" });
@@ -86,6 +100,8 @@ const createNotes = asyncHandler(async (req, res) => {
 
   await collectionFound.updateOne({ $inc: { totalNotesInside: +1 } });
 
+  await deleteKey(`Notes${collectionFound._id}`);
+
   res.status(200).json({ success: true, message: "Note Uploaded" });
 });
 
@@ -97,6 +113,14 @@ const getNotes = asyncHandler(async (req, res) => {
       success: false,
       message: "Please provide a valid collection id",
     });
+
+  const cache = await getKey(`Notes${collectionID}`);
+
+  if (cache) {
+    const arr = JSON.parse(cache);
+    console.log(`Found Notes in cache`);
+    return res.status(200).json({ ...arr });
+  }
 
   const foundNotes = await Note.find({
     collectionID: collectionID,
@@ -111,6 +135,8 @@ const getNotes = asyncHandler(async (req, res) => {
     };
     return obj;
   });
+
+  await setKey(`Notes${collectionID}`, JSON.stringify({ arr }));
 
   res.status(200).json({ arr });
 });
@@ -133,6 +159,8 @@ const deleteCollection = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "No folder found" });
 
   const notes = await Note.deleteMany({ collectionID, userId: req.id });
+
+  await deleteKey(`Collection${req.id}`);
 
   res.status(200).json({ success: true, message: "Folder deleted" });
 });

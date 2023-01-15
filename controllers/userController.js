@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Note = require("../models/Note");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+const { getKey, setKey } = require("../config/redis");
 // const fs = require("fs");
 
 // @ Create new user
@@ -34,6 +35,22 @@ const createNewUser = asyncHandler(async (req, res) => {
 const getUserById = asyncHandler(async (req, res) => {
   const id = req.id;
 
+  if (!id) {
+    return res
+      .sendStatus(500)
+      .json({ success: false, message: "something went wrong" });
+  }
+
+  const cacheUser = await getKey(id);
+
+  if (cacheUser) {
+    const parseData = JSON.parse(cacheUser);
+    console.log("User found in cache");
+    return res
+      .status(200)
+      .json({ email: parseData.email, name: parseData.name });
+  }
+
   const foundUser = await User.findById(id);
 
   if (!foundUser)
@@ -45,7 +62,9 @@ const getUserById = asyncHandler(async (req, res) => {
     email: foundUser.email,
     name: foundUser.name,
   };
-  res.status(200).json({ email: foundUser.email, name: foundUser.name });
+
+  await setKey(id, JSON.stringify(userInfo), 3600);
+  res.status(200).json(userInfo);
 });
 
 // @ Update user
