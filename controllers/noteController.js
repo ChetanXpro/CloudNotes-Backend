@@ -4,6 +4,7 @@ const Collection = require("../models/Collection");
 const asyncHandler = require("express-async-handler");
 const formatBytes = require("../config/formateByte");
 const { getKey, setKey, deleteKey } = require("../config/redis");
+const containerClient = require("../config/azureStorage");
 
 // Create collection
 const createCollection = asyncHandler(async (req, res) => {
@@ -66,7 +67,7 @@ const getCollectionList = asyncHandler(async (req, res) => {
     };
     return obj;
   });
-  console.log(arr);
+  
 
   await setKey(`Collection${id}`, JSON.stringify({ arr }));
 
@@ -75,9 +76,13 @@ const getCollectionList = asyncHandler(async (req, res) => {
 
 // Create notes
 const createNotes = asyncHandler(async (req, res) => {
-  const { collectionName, noteName, url, fileSize } = req.body;
+  const { collectionName, noteName, url, fileSize, blobName } = req.body;
 
-  if (typeof (collectionName || noteName || url) !== "string" && !fileSize)
+  if (
+    typeof (collectionName || noteName || url) !== "string" &&
+    !fileSize &&
+    !blobName
+  )
     return res.status(400).json({ success: false, message: "Invalid data" });
 
   const size = formatBytes(fileSize);
@@ -95,6 +100,7 @@ const createNotes = asyncHandler(async (req, res) => {
     userId: req.id,
     url,
     size,
+    blobName,
     collectionID: collectionFound._id,
   });
 
@@ -152,11 +158,13 @@ const deleteNote = asyncHandler(async (req, res) => {
     });
 
   const foundNote = await Note.findOne({ _id: noteID, userId: req.id });
+  await containerClient.deleteBlob(foundNote.blobName);
 
   if (!foundNote)
     return res.status(400).json({ success: false, message: "No note found" });
 
   const collectionFound = await Collection.findById(foundNote.collectionID);
+
   await collectionFound.updateOne({ $inc: { totalNotesInside: -1 } });
 
   const cc = await foundNote.deleteOne();
@@ -184,7 +192,18 @@ const deleteCollection = asyncHandler(async (req, res) => {
   if (!deletedCount)
     return res.status(400).json({ success: false, message: "No folder found" });
 
-  const notes = await Note.deleteMany({ collectionID, userId: req.id });
+  const notes = await Note.find({ collectionID, userId: req.id });
+
+  let promise = [];
+  notes.forEach((i) => {
+    
+    promise.push(containerClient.deleteBlob(i.blobName));
+  });
+
+  const resol = await Promise.allSettled(promise);
+ 
+
+  await Note.deleteMany({ collectionID, userId: req.id });
 
   await deleteKey(`Collection${req.id}`);
 

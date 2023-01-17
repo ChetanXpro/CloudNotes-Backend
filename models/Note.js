@@ -16,6 +16,7 @@ const schema = new mongoose.Schema(
       type: String,
       require: true,
     },
+    blobName: { type: String, require: true },
     size: { type: String, require: true },
     url: {
       type: String,

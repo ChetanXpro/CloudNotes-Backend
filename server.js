@@ -19,6 +19,7 @@ app.use(cookieParser());
 
 app.use("/user", require("./routes/userRoutes"));
 app.use("/note", require("./routes/noteRoutes"));
+app.use("/public", require("./routes/publicNotesRoute"));
 app.use("/auth", require("./routes/authRoutes"));
 
 app.use(errorHandler);
