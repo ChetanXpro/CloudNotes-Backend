@@ -1,8 +1,8 @@
 import redis from "async-redis";
 import logger from "./logger.js";
 
-var cacheHostName = process.env.CACHE_HOST;
-var cachePassword = process.env.CACHE_PASSWORD;
+var cacheHostName = "cloudNotes.redis.cache.windows.net";
+var cachePassword = "luV9IAhZPosoEKnGHpzBFBl9jwl0iYMapAzCaFLrhEE=";
 const redisClient = redis.createClient({
   url: "rediss://" + cacheHostName + ":6380",
   password: cachePassword,
