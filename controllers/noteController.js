@@ -1,10 +1,10 @@
-const User = require("../models/User");
-const Note = require("../models/Note");
-const Collection = require("../models/Collection");
-const asyncHandler = require("express-async-handler");
-const formatBytes = require("../config/formateByte");
-const { getKey, setKey, deleteKey } = require("../config/redis");
-const containerClient = require("../config/azureStorage");
+import User from "../models/User.js";
+import Note from "../models/Note.js";
+import Collection from "../models/Collection.js";
+import asyncHandler from "express-async-handler";
+import formatBytes from "../config/formateByte.js";
+import { getKey, setKey, deleteKey } from "../config/redis.js";
+import containerClient from "../config/azureStorage.js";
 
 // Create collection
 const createCollection = asyncHandler(async (req, res) => {
@@ -67,7 +67,6 @@ const getCollectionList = asyncHandler(async (req, res) => {
     };
     return obj;
   });
-  
 
   await setKey(`Collection${id}`, JSON.stringify({ arr }));
 
@@ -196,14 +195,12 @@ const deleteCollection = asyncHandler(async (req, res) => {
 
   let promise = [];
   notes.forEach((i) => {
-    
     promise.push(containerClient.deleteBlob(i.blobName));
   });
 
   const resol = await Promise.allSettled(promise);
- 
 
-  await Note.deleteMany({ collectionID, userId: req.id });
+  await deleteMany({ collectionID, userId: req.id });
 
   await deleteKey(`Collection${req.id}`);
 
@@ -212,7 +209,7 @@ const deleteCollection = asyncHandler(async (req, res) => {
 
 const updateNote = asyncHandler(async (req, res) => {});
 
-module.exports = {
+export default {
   createCollection,
   updateNote,
   deleteNote,

@@ -1,5 +1,5 @@
-const rateLimit = require("express-rate-limit");
-const logger = require("../config/logger");
+import rateLimit from "express-rate-limit";
+import { error } from "../config/logger";
 
 
 const loginLimiter = rateLimit({
@@ -10,7 +10,7 @@ const loginLimiter = rateLimit({
       "Too many login attempts from this IP, please try again after a 60 second pause",
   },
   handler: (req, res, next, options) => {
-    logger.error(
+    error(
       `Too Many Requests: ${options.message.message}\t${req.method}\t${req.url}\t${req.headers.origin},`,
       "errorLog.log"
     );

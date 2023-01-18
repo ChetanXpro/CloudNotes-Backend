@@ -1,8 +1,8 @@
-const User = require("../models/User");
+import User from "../models/User.js";
 
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const asyncHandler = require("express-async-handler");
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import asyncHandler from "express-async-handler";
 
 const login = asyncHandler(async (req, res) => {
   const cookies = req.cookies;
@@ -50,7 +50,6 @@ const login = asyncHandler(async (req, res) => {
   });
 
   res.json({ email: foundUser.email, name: foundUser.name, accessToken });
- 
 });
 
 // !Refresh
@@ -112,7 +111,7 @@ const logout = asyncHandler(async (req, res) => {
   res.status(204).json({ message: "Logout" });
 });
 
-module.exports = {
+export default {
   login,
   refresh,
   logout,

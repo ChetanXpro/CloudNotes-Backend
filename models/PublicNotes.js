@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const schema = new mongoose.Schema(
+const schema = new Schema(
   {
     name: {
       type: String,
@@ -37,4 +37,4 @@ const schema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("PublicNotes", schema);
+export default model("PublicNotes", schema);

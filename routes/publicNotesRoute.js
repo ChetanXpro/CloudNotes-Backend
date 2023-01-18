@@ -1,9 +1,10 @@
-const express = require("express");
+import { Router } from "express";
+import { getUniversity, getUniversityDetails } from "../controllers/publicNotesController.js";
+const router = Router();
 
-const router = express.Router();
-// const noteController = require("../controllers/publicNoteController");
-const verifyJWT = require("../middleware/verifyJWT");
+import verifyJWT from "../middleware/verifyJWT.js";
 router.use(verifyJWT);
 
-// router.get("/", noteController.getNotes);
-module.exports = router;
+router.get("/university", getUniversity);
+router.post("/university", getUniversityDetails);
+export default router;

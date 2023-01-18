@@ -1,8 +1,8 @@
-const express = require("express");
+import { Router } from "express";
 
-const router = express.Router();
-const userController = require("../controllers/userController");
-const verifyJWT = require("../middleware/verifyJWT");
+const router = Router();
+import userController from "../controllers/userController.js";
+import verifyJWT from "../middleware/verifyJWT.js";
 
 // router.use(verifyJWT);
 
@@ -12,4 +12,4 @@ router.get("/getUser", verifyJWT, userController.getUserById);
 router.patch("/", verifyJWT, userController.updateUser);
 router.delete("/", verifyJWT, userController.deleteUser);
 
-module.exports = router;
+export default router;
