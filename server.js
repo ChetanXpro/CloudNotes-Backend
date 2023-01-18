@@ -8,9 +8,10 @@ import errorHandler from "./middleware/errorHandler.js";
 import cookieParser from "cookie-parser";
 
 import cors from "cors";
-import corsOption from "./config/corsOptons.js";
+
 import connectDB from "./config/dbConnecton.js";
 import logger from "./config/logger.js";
+import corsOption from "./config/corsOptons.js";
 
 const port = process.env.PORT || 3500;
 
