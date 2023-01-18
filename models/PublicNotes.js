@@ -30,6 +30,7 @@ const schema = new Schema(
     uploadedBy: {
       type: String,
       require: true,
+      
     },
   },
   {
