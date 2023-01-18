@@ -1,8 +1,8 @@
-const express = require("express");
+import { Router } from "express";
 
-const router = express.Router();
-const noteController = require("../controllers/noteController");
-const verifyJWT = require("../middleware/verifyJWT");
+const router = Router();
+import noteController from "../controllers/noteController.js";
+import verifyJWT from "../middleware/verifyJWT.js";
 router.use(verifyJWT);
 
 router.get("/", noteController.getNotes);
@@ -13,4 +13,4 @@ router.get("/collection", noteController.getCollectionList);
 router.patch("/", noteController.updateNote);
 router.delete("/", noteController.deleteNote);
 
-module.exports = router;
+export default router;

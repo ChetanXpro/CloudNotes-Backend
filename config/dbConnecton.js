@@ -1,12 +1,14 @@
-const mongoose = require("mongoose");
-const logger = require("./logger");
+import { set, connect } from "mongoose";
+import logger from "./logger.js";
+// import { info, error as _error } from "./logger";
+
 // const logger = require("./logger");
 
 
 const connectDB = async () => {
   try {
-    mongoose.set('strictQuery', false)
-    await mongoose.connect(process.env.DATABASE_URI, () => {
+    set('strictQuery', false)
+    await connect(process.env.DATABASE_URI, () => {
       logger.info("Database connected");
     });
   } catch (error) {
@@ -14,4 +16,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+export default connectDB;

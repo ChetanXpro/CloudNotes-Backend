@@ -1,9 +1,12 @@
-const User = require("../models/User");
-const Note = require("../models/Note");
-const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcrypt");
-const { getKey, setKey } = require("../config/redis");
-// const fs = require("fs");
+
+import User from '../models/User.js'
+import Note from "../models/Note.js";
+
+import asyncHandler from 'express-async-handler'
+import bcrypt from 'bcrypt'
+import { getKey, setKey } from "../config/redis.js";
+import fs from 'fs'
+
 
 // @ Create new user
 const createNewUser = asyncHandler(async (req, res) => {
@@ -115,7 +118,8 @@ const deleteUser = asyncHandler(async (req, res) => {
   res.json(reply);
 });
 
-module.exports = {
+
+export default {
   createNewUser,
   updateUser,
   deleteUser,

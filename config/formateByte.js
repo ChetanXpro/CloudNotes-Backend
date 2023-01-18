@@ -9,4 +9,4 @@ const formatBytes = (bytes, decimals = 2) => {
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 };
-module.exports = formatBytes;
+export default formatBytes;

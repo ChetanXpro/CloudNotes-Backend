@@ -1,25 +1,33 @@
-require("dotenv").config();
-const express = require("express");
-const app = express();
-const path = require("path");
-const errorHandler = require("./middleware/errorHandler");
-const cookieParser = require("cookie-parser");
+import "dotenv/config";
+import path from "path";
 
-const cors = require("cors");
-const corsOption = require("./config/corsOptons");
-const connectDB = require("./config/dbConnecton");
-const logger = require("./config/logger");
+import express, { json } from "express";
+const app = express();
+
+import errorHandler from "./middleware/errorHandler.js";
+import cookieParser from "cookie-parser";
+
+import cors from "cors";
+import corsOption from "./config/corsOptons.js";
+import connectDB from "./config/dbConnecton.js";
+import logger from "./config/logger.js";
 
 const port = process.env.PORT || 3500;
 
 app.use("*", cors(corsOption));
 
-app.use(express.json());
+app.use(json());
 app.use(cookieParser());
 
-app.use("/user", require("./routes/userRoutes"));
-app.use("/note", require("./routes/noteRoutes"));
-app.use("/auth", require("./routes/authRoutes"));
+import userRoutes from "./routes/userRoutes.js";
+import noteRoutes from "./routes/noteRoutes.js";
+import publicNotesRoute from "./routes/publicNotesRoute.js";
+import authRoutes from "./routes/authRoutes.js";
+
+app.use("/user", userRoutes);
+app.use("/note", noteRoutes);
+app.use("/public", publicNotesRoute);
+app.use("/auth", authRoutes);
 
 app.use(errorHandler);
 app.use(cookieParser());
