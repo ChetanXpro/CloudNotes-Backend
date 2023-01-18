@@ -37,11 +37,17 @@ export const getUniversity = asyncHandler(async (req, res) => {
 });
 
 export const getUniversityDetails = asyncHandler(async (req, res) => {
-  const selectedUniversity = req.body;
+  const { selectedUniversity } = req.body;
 
-  const course = university[selectedUniversity].course;
-  const semester = university[selectedUniversity].semester;
-  const subject = university[selectedUniversity].subject;
+  if (!selectedUniversity)
+   return res.status(400).json({ message: "please provide valid inputs" });
+
+  const course = university[selectedUniversity]?.course;
+  const semester = university[selectedUniversity]?.semester;
+  const subject = university[selectedUniversity]?.subject;
+  if (!course || !semester || !subject) {
+   return res.status(400).json({ message: "please provide valid inputs" });
+  }
 
   res.status(200).json({ course, semester, subject });
 });
