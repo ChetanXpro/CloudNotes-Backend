@@ -24,11 +24,13 @@ import userRoutes from "./routes/userRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
 import publicNotesRoute from "./routes/publicNotesRoute.js";
 import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 app.use("/user", userRoutes);
 app.use("/note", noteRoutes);
 app.use("/public", publicNotesRoute);
 app.use("/auth", authRoutes);
+app.use("/admin", adminRoutes);
 
 app.use(errorHandler);
 app.use(cookieParser());

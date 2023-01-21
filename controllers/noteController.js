@@ -6,6 +6,8 @@ import formatBytes from "../config/formateByte.js";
 import { getKey, setKey, deleteKey } from "../config/redis.js";
 import containerClient from "../config/azureStorage.js";
 
+import PublicNotes from "../models/PublicNotes.js";
+
 // Create collection
 const createCollection = asyncHandler(async (req, res) => {
   if (!req.id)
@@ -207,11 +209,11 @@ const deleteCollection = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, message: "Folder deleted" });
 });
 
-const updateNote = asyncHandler(async (req, res) => {});
+
 
 export default {
   createCollection,
-  updateNote,
+
   deleteNote,
   getCollectionList,
   createNotes,

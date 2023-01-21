@@ -5,10 +5,8 @@ export const university = {
     subject: ["history of india iv", "modern india"],
   },
   "IIT Delhi": {
-    course: ["History hons", "political hons"],
+    course: ["electrical", "cs"],
     semester: [1, 2, 3, 4, 5, 6],
     subject: ["history of india iv", "modern india"],
   },
 };
-
-

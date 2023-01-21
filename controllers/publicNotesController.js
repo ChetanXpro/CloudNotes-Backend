@@ -7,42 +7,14 @@ import formatBytes from "../config/formateByte.js";
 import { getKey, setKey, deleteKey } from "../config/redis.js";
 import containerClient from "../config/azureStorage.js";
 import { university } from "../data/university.js";
-
+import Favourite from "../models/Favourite.js";
+import { json } from "express";
 // Create notes
-export const createNotes = asyncHandler(async (req, res) => {
-  const { university, course, semester, subject, name, url, fileSize } =
-    req.body;
-
-  if (
-    !university ||
-    !course ||
-    !semester ||
-    !subject ||
-    !name ||
-    !url ||
-    !fileSize
-  ) {
-    res.json({ message: "Please provide all inputs" });
-  }
-
-  await PublicNotes.create({
-    name,
-    url,
-    size,
-    university,
-    course,
-    semester,
-    uploadedBy,
-    subject,
-  });
-
-  res.status(200).json({ success: true, message: "Note Uploaded" });
-});
 
 export const getUniversity = asyncHandler(async (req, res) => {
   const universityName = [];
   for (const key in university) {
-    universityName.push(key);
+    universityName.push({ id: key, label: key, value: key });
   }
 
   res.status(200).json({ universityName });
@@ -54,12 +26,91 @@ export const getUniversityDetails = asyncHandler(async (req, res) => {
   if (!selectedUniversity)
     return res.status(400).json({ message: "please provide valid inputs" });
 
-  const course = university[selectedUniversity]?.course;
-  const semester = university[selectedUniversity]?.semester;
-  const subject = university[selectedUniversity]?.subject;
+  const course = university[selectedUniversity]?.course.map((c) => {
+    return { label: c, value: c };
+  });
+  const semester = university[selectedUniversity]?.semester.map((s) => {
+    return { label: s, value: s };
+  });
+  const subject = university[selectedUniversity]?.subject.map((s) => {
+    return { label: s, value: s };
+  });
   if (!course || !semester || !subject) {
     return res.status(400).json({ message: "university not found" });
   }
 
   res.status(200).json({ course, semester, subject });
+});
+
+export const searchNotes = asyncHandler(async (req, res) => {
+  const {
+    selectedUniversity,
+    selectedCourse,
+    selectedSemester,
+    selectedSubject,
+  } = req.body;
+
+  if (
+    !selectedUniversity ||
+    !selectedCourse ||
+    !selectedSemester ||
+    !selectedSubject
+  ) {
+    return res.status(400).json({ message: "Please provide all details" });
+  }
+
+  const foundNotes = await PublicNotes.find({
+    university: selectedUniversity,
+    course: selectedCourse,
+    semester: selectedSemester,
+    subject: selectedSubject,
+  });
+  const notes = foundNotes.map((i) => {
+    return {
+      id: i._id,
+      name: i.name,
+      url: i.url,
+      size: i.size,
+      uploadedBy: i.uploadedBy,
+    };
+  });
+  res.status(200).json({ notes });
+});
+
+export const addToFav = asyncHandler(async (req, res) => {
+  const { noteId } = req.body;
+  if (!noteId) return res.status(200).json({ messag: "Provide valid input" });
+
+  const foundNote = await PublicNotes.findById(noteId);
+
+  const foundInFav = await Favourite.findOne({ parentNoteId: noteId });
+
+  if (foundInFav) {
+    return res.status(400).json({ message: "Already in favourite list" });
+  }
+
+  const created = await Favourite.create({
+    parentNoteId: noteId,
+    userId: req.id,
+    name: foundNote.name,
+    size: foundNote.size,
+    url: foundNote.url,
+  });
+
+  res.status(200).json({ message: "Added to favourite" });
+});
+
+export const removeFav = asyncHandler(async (req, res) => {
+  const { noteId } = req.body;
+
+  await Favourite.findOneAndDelete({ _id: noteId });
+
+  res.status(200).json({ message: "Removed from favourite list" });
+});
+
+export const getFavList = asyncHandler(async (req, res) => {
+  if (!req.id) return res.status(400).json({ message: "Something went wrong" });
+  const favlist = await Favourite.find({ userId: req.id });
+
+  res.status(200).json({ favlist });
 });

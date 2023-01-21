@@ -18,7 +18,7 @@ const schema = new Schema(
     },
     roles: {
       type: String,
-      enum: ["student", "teacher", "other"],
+      enum: ["student", "teacher", "other", "admin"],
       default: "student",
     },
     active: {

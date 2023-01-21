@@ -23,6 +23,7 @@ const schema = new Schema(
       type: String,
       require: true,
     },
+    
     subject: {
       type: String,
       require: true,
@@ -30,7 +31,6 @@ const schema = new Schema(
     uploadedBy: {
       type: String,
       require: true,
-      
     },
   },
   {
