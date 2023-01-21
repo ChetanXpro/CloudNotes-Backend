@@ -10,7 +10,7 @@ import { university } from "../data/university.js";
 import Favourite from "../models/Favourite.js";
 import { json } from "express";
 // Create notes
-
+// Need admin right
 export const getUniversity = asyncHandler(async (req, res) => {
   const universityName = [];
   for (const key in university) {

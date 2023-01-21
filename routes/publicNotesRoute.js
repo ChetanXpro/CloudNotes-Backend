@@ -10,7 +10,6 @@ import {
 const router = Router();
 
 import verifyJWT from "../middleware/verifyJWT.js";
-// router.use(verifyJWT);
 
 router.get("/university", getUniversity);
 router.post("/university", getUniversityDetails);

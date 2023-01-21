@@ -1,12 +1,10 @@
-
-import User from '../models/User.js'
+import User from "../models/User.js";
 import Note from "../models/Note.js";
 
-import asyncHandler from 'express-async-handler'
-import bcrypt from 'bcrypt'
+import asyncHandler from "express-async-handler";
+import bcrypt from "bcrypt";
 import { getKey, setKey } from "../config/redis.js";
-import fs from 'fs'
-
+import fs from "fs";
 
 // @ Create new user
 const createNewUser = asyncHandler(async (req, res) => {
@@ -64,6 +62,7 @@ const getUserById = asyncHandler(async (req, res) => {
   const userInfo = {
     email: foundUser.email,
     name: foundUser.name,
+    role: foundUser.roles,
   };
 
   await setKey(id, JSON.stringify(userInfo), 3600);
@@ -117,7 +116,6 @@ const deleteUser = asyncHandler(async (req, res) => {
 
   res.json(reply);
 });
-
 
 export default {
   createNewUser,
