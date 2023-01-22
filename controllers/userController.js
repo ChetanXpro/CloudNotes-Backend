@@ -43,13 +43,16 @@ const getUserById = asyncHandler(async (req, res) => {
   }
 
   const cacheUser = await getKey(id);
+  
 
   if (cacheUser) {
     const parseData = JSON.parse(cacheUser);
     console.log("User found in cache");
-    return res
-      .status(200)
-      .json({ email: parseData.email, name: parseData.name });
+    return res.status(200).json({
+      email: parseData.email,
+      name: parseData.name,
+      role: parseData.role,
+    });
   }
 
   const foundUser = await User.findById(id);
@@ -64,7 +67,7 @@ const getUserById = asyncHandler(async (req, res) => {
     name: foundUser.name,
     role: foundUser.roles,
   };
-
+ 
   await setKey(id, JSON.stringify(userInfo), 3600);
   res.status(200).json(userInfo);
 });

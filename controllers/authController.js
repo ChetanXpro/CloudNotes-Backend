@@ -25,7 +25,7 @@ const login = asyncHandler(async (req, res) => {
   const accessToken = jwt.sign(
     {
       id: foundUser.id,
-      role:foundUser.roles
+      role: foundUser.roles,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "24h" }
@@ -50,7 +50,12 @@ const login = asyncHandler(async (req, res) => {
     sameSite: "lax",
   });
 
-  res.json({ email: foundUser.email, name: foundUser.name, accessToken });
+  res.json({
+    email: foundUser.email,
+    name: foundUser.name,
+    role: foundUser.roles,
+    accessToken,
+  });
 });
 
 // !Refresh
