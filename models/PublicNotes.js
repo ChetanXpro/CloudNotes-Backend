@@ -15,14 +15,7 @@ const schema = new Schema(
       type: String,
       require: true,
     },
-    course: {
-      type: String,
-      require: true,
-    },
-    semester: {
-      type: String,
-      require: true,
-    },
+
     
     subject: {
       type: String,

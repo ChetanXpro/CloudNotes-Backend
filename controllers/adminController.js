@@ -10,28 +10,18 @@ import { university } from "../data/university.js";
 
 // Create notes
 export const createNotes = asyncHandler(async (req, res) => {
-  const { university, course, semester, subject, name, url, fileSize } =
-    req.body;
+  const { university, subject, name, url, fileSize } = req.body;
 
-  if (
-    !university ||
-    !course ||
-    !semester ||
-    !subject ||
-    !name ||
-    !url ||
-    !fileSize
-  ) {
+  if (!university || !subject || !name || !url || !fileSize) {
     res.json({ message: "Please provide all inputs" });
   }
 
   const created = await PublicNotes.create({
     name,
     url,
-    size: fileSize,
+    size: formatBytes(fileSize),
     university,
-    course,
-    semester,
+
     uploadedBy: req.id,
     subject,
   });

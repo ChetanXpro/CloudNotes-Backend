@@ -20,40 +20,49 @@ export const getUniversity = asyncHandler(async (req, res) => {
   res.status(200).json({ universityName });
 });
 
+export const getCourse = asyncHandler(async (req, res) => {
+  const { selectedUniversity } = req.body;
+
+  if (!selectedUniversity)
+    return res.status(400).json({ message: "please provide valid inputs" });
+  const course = university[selectedUniversity]?.course.map((c) => {
+    return { label: c, value: c };
+  });
+  if (!course || !semester || !subject) {
+    return res.status(400).json({ message: "university not found" });
+  }
+
+  res.status(200).json({ course });
+});
+
+
 export const getUniversityDetails = asyncHandler(async (req, res) => {
   const { selectedUniversity } = req.body;
 
   if (!selectedUniversity)
     return res.status(400).json({ message: "please provide valid inputs" });
 
-  const course = university[selectedUniversity]?.course.map((c) => {
-    return { label: c, value: c };
-  });
-  const semester = university[selectedUniversity]?.semester.map((s) => {
-    return { label: s, value: s };
-  });
+
   const subject = university[selectedUniversity]?.subject.map((s) => {
     return { label: s, value: s };
   });
-  if (!course || !semester || !subject) {
+  if (!subject) {
     return res.status(400).json({ message: "university not found" });
   }
 
-  res.status(200).json({ course, semester, subject });
+  res.status(200).json({  subject });
 });
 
 export const searchNotes = asyncHandler(async (req, res) => {
   const {
     selectedUniversity,
-    selectedCourse,
-    selectedSemester,
+   
     selectedSubject,
   } = req.body;
 
   if (
     !selectedUniversity ||
-    !selectedCourse ||
-    !selectedSemester ||
+
     !selectedSubject
   ) {
     return res.status(400).json({ message: "Please provide all details" });
@@ -61,8 +70,7 @@ export const searchNotes = asyncHandler(async (req, res) => {
 
   const foundNotes = await PublicNotes.find({
     university: selectedUniversity,
-    course: selectedCourse,
-    semester: selectedSemester,
+  
     subject: selectedSubject,
   });
   const notes = foundNotes.map((i) => {
